@@ -32,6 +32,8 @@
 package com.yogurtpowered;
 
 import java.lang.ref.WeakReference;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.WeakHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -68,6 +70,8 @@ public class UppercaseBenchmark {
             100000);
 
     private static final LRUCache<String, String> lruCache = new LRUCache<>(1_000_000);
+
+    private static final Map<String, String> treeMap = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
 
     private String originalString = "MixedCaseString";
 
@@ -131,6 +135,18 @@ public class UppercaseBenchmark {
 
         final String upper = StringUtils.upperCase(originalString);
         lruCache.put(originalString, upper);
+        return upper;
+    }
+
+    @Benchmark
+    public String treeMap() {
+        final String cached = treeMap.get(originalString);
+        if (cached != null) {
+            return cached;
+        }
+
+        final String upper = StringUtils.upperCase(originalString);
+        treeMap.put(originalString, upper);
         return upper;
     }
 
